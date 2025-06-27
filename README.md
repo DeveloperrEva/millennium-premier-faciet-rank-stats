@@ -36,8 +36,10 @@
    - **Default (Windows):** `C:\Program Files (x86)\Steam\plugins`
    - **Default (Unix):** `~/.millennium/plugins`
 3. In addition, navigate to **`C:\Program Files (x86)\Steam\ext\data\assets`**, open (or create) the file `requirements.txt`, and add the following lines:
+```bash
 bs4
 cloudscraper
+```
 
 4. Launch Steam and activate the plugin in **Millennium settings**.
 
@@ -50,8 +52,10 @@ cloudscraper
 - **По умолчанию (Windows):** `C:\Program Files (x86)\Steam\plugins`
 - **По умолчанию (Unix):** `~/.millennium/plugins`
 3. Затем перейдите в **`C:\Program Files (x86)\Steam\ext\data\assets`**, откройте файл `requirements.txt` и добавьте:
+```bash
 bs4
 cloudscraper
+```
 
 4. Запустите Steam и включите плагин в настройках Millennium.
 
@@ -59,12 +63,13 @@ cloudscraper
 
 ## 🛠️ Building | Сборка
 
+```bash
 git clone https://github.com/DeveloperrEva/millennium-premier-faciet-rank-stats
 cd millennium-premier-faciet-rank-stats
 pnpm install
 pnpm run build
 millennium plugins enable faceit_premier_stats
-
+```
 ---
 
 ## 📌 Notes | Примечания
