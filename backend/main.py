@@ -3,6 +3,7 @@ import requests
 import json
 import shutil
 import os
+from csstats import CsStats
 
 # API Headers for FaceIt requests (Public Key)
 HEADERS = {
@@ -10,7 +11,7 @@ HEADERS = {
     "Authorization": "Bearer 8f9985f3-3cf5-43de-970c-dfe244a57fb0"
 }
 
-HEADERS_LEETIFY= {
+HEADERS_LEETIFY = {
     "Accept": "application/json",
 }
 
@@ -48,21 +49,19 @@ class FaceItUser:
     def get_user_by_steamId(steamId: str) -> "FaceItUser | None":
         """Fetches FaceIt user details by Steam ID."""
         url = f"https://open.faceit.com/data/v4/players?game=cs2&game_player_id={steamId}"
-        
         try:
             response = requests.get(url, headers=HEADERS)
             response.raise_for_status()
         except requests.RequestException as e:
             print(f"Error fetching FaceIt user data: {e}")
             return None
-        
+
         if response.status_code == 404:
             return None
         elif response.status_code != 200:
             raise Exception(f"Error fetching data: {response.status_code}")
-        
+
         data = response.json()
-        
         return FaceItUser(
             id=data.get("player_id", ""),
             nickname=data.get("nickname", "Unknown"),
@@ -76,13 +75,12 @@ class FaceItUser:
     def get_user_stats(self):
         """Fetches user stats from FaceIt API."""
         stats_url = f"https://open.faceit.com/data/v4/players/{self.id}/stats/cs2"
-        
         try:
             response = requests.get(stats_url, headers=HEADERS)
             response.raise_for_status()
             r = response.json()
             lifetime_stats = r.get("lifetime", {})
-            
+
             return self.UserStats(
                 matches=int(lifetime_stats.get("Matches", 0)),
                 avg_hs=float(lifetime_stats.get("Average Headshots %", 0.0)),
@@ -92,14 +90,14 @@ class FaceItUser:
             )
         except requests.RequestException as e:
             print(f"Failed to fetch FaceIt stats: {e}")
-        
         return None
-    
+
     def __repr__(self):
         return (
             f"FaceItUser(id={self.id}, nickname={self.nickname}, country={self.country}, "
             f"faceit_elo={self.faceit_elo}, skill_level={self.skill_level})"
         )
+
 
 # Function to get user data by Steam ID
 def get_user_by_steamId(steamId):
@@ -109,10 +107,10 @@ def get_user_by_steamId(steamId):
         return json.dumps(user.__dict__)
     return None
 
+
 def get_aim_rating(steamId):
     """Fetches aim rating from Leetify API."""
     url = f"https://api.cs-prod.leetify.com/api/profile/id/{steamId}"
-        
     try:
         response = requests.get(url, headers=HEADERS_LEETIFY)
         response.raise_for_status()
@@ -123,26 +121,34 @@ def get_aim_rating(steamId):
         print(f"Failed to fetch aim rating: {e}")
         return None
 
+
+def get_csstats(steamId):
+    """Fetches Premier current and best ratings from CSStats.gg."""
+    data = CsStats.get_csstats(steamId)
+    return json.dumps(data)
+
+
 def GetPluginDir():
     return os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..'))
+
 
 class Plugin:
     def copy_frontend_files(self):
         css_source = os.path.join(GetPluginDir(), 'static', 'faceit_stats.css')
         static_source = os.path.join(GetPluginDir(), 'static')
         png_source = [f for f in os.listdir(static_source) if f.endswith('.png')]
-        
+
         steamui_dest = os.path.join(Millennium.steam_path(), 'steamui')
         faceit_finder_dest = os.path.join(steamui_dest, 'FaceItFinder')
         os.makedirs(faceit_finder_dest, exist_ok=True)
-        
+
         try:
             if os.path.exists(css_source):
                 shutil.copy(css_source, steamui_dest)
                 print(f'Copied {css_source} to {steamui_dest}')
             else:
                 print(f'File not found: {css_source}')
-            
+
             for png_file in png_source:
                 png_file_path = os.path.join(static_source, png_file)
                 if os.path.exists(png_file_path):
@@ -150,19 +156,17 @@ class Plugin:
                     print(f'Copied {png_file_path} to {faceit_finder_dest}')
                 else:
                     print(f'File not found: {png_file_path}')
-                    
+
         except Exception as e:
             print(f'Error: {e}')
-    
+
     def _front_end_loaded(self):
         LOGGER.log("The front end has loaded!")
 
-    def _load(self):     
+    def _load(self):
         """Initializes the plugin."""
         LOGGER.log(f"Bootstrapping FaceItStats, Millennium {Millennium.version()}")
-        
         self.copy_frontend_files()
-        
         Millennium.add_browser_css("faceit_stats.css")
         Millennium.ready()
 

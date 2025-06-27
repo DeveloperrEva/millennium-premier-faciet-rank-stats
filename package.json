@@ -4,18 +4,19 @@
     "build": "millennium-ttc --build prod"
   },
   "devDependencies": {
+    "@babel/core": "^7.27.0",
     "@babel/preset-env": "^7.26.7",
     "@babel/preset-react": "^7.26.3",
-    "@types/react": "16.14.0",
+    "@types/react": "^18.0.0",
     "@types/react-dom": "^18.3.5",
     "@types/webpack": "^5.28.5"
   },
   "type": "module",
-  "name": "faceit_stats",
+  "name": "faceit_premier_stats",
   "version": "1.0.3",
-  "description": "FaceIt Stats on steam profiles.",
+  "description": "FaceIt + Premier Stats on steam profiles.",
   "main": "./webkit/index.ts",
-  "author": "alowave",
+  "author": "developereva",
   "license": "MIT",
   "dependencies": {
     "@steambrew/api": "^4.2.2",
